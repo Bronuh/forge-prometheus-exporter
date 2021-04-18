@@ -8,6 +8,9 @@ After startup, the Prometheus metrics endpoint should be available at localhost:
 
 The metrics port can be customized in the mods's config.cfg (a default config will be created after the first use).
 
+## Metrics command
+Everyone can use /metrics command, which shows the average TPS, online players, allocated memory and the number of loaded chunks
+
 ## Default config
 ```
 # Configuration file
