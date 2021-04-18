@@ -2,20 +2,25 @@
 A Forge mod which exports minecraft 1.12.x server stats to Prometheus. Based on [Minecraft Prometheus Exporter for Bukkit](https://github.com/sladkoff/minecraft-prometheus-exporter)
 
 ## Quick Start
-Drop the prometheusexporter-1.0.jar into your mods directory and start your Minecraft Forge server.
+Drop the prometheusexporter.jar into your mods directory and start your Minecraft Forge server.
 
 After startup, the Prometheus metrics endpoint should be available at localhost:9225.
 
-The metrics port can be customized in the mods's config.cfg (a default config will be created after the first use).
+The metrics port can be customized in the mod's config.cfg (a default config will be created after the first use).
 
 ## Metrics command
-Everyone can use /metrics command, which shows the average TPS, online players, allocated memory and the number of loaded chunks
+By default everyone can use /metrics command, which shows the average TPS, online players, allocated memory and the number of loaded chunks
 
 ## Default config
 ```
 # Configuration file
 
 ~CONFIG_VERSION: 1.0
+
+commands {
+    B:"Admin only commands"=false
+}
+
 
 export {
     I:"Prometheus export port"=9225
