@@ -24,6 +24,13 @@ public class MetricsCommand extends CommandBase {
 
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        if(CommonProxy.opCommands){
+            if(sender instanceof EntityPlayer){
+                return server.getPlayerList().canSendCommands(((EntityPlayer) sender).getGameProfile());
+            }else{
+                return true;
+            }
+        }
         return true;
     }
     @Override

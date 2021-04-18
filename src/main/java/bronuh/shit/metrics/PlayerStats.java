@@ -1,15 +1,13 @@
 package bronuh.shit.metrics;
 
+import bronuh.shit.tools.PlayerContainer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatCrafting;
 import net.minecraft.stats.StatList;
 import net.minecraft.stats.StatisticsManagerServer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerStats {
 
@@ -42,19 +40,23 @@ public class PlayerStats {
     };
 
     public String playerName;
-    public UUID playerUUID;
+    public String playerUUID;
 
 
 
     public PlayerStats(EntityPlayerMP player){
         playerName = player.getName();
-        playerUUID = player.getUniqueID();
-        scanStats(player,statIds);
+        playerUUID = player.getUniqueID().toString();
+        scanStats(player);
     }
 
+    public PlayerStats(PlayerContainer player){
+        playerName = player.name;
+        playerUUID = player.UUID;
+        scanStats(player);
+    }
 
-
-    public static String getEnumName(Stat stat) {
+    public static String getEnumName(String stat) {
         if(!cached){
             for(StatBase _stat : StatList.BASIC_STATS){
                 namesCache.put(_stat.statId, rename(_stat.statId));
@@ -64,7 +66,17 @@ public class PlayerStats {
             }
             cached = true;
         }
-        return namesCache.get(stat.statId);
+
+        String enumName = namesCache.get(stat);
+        if(enumName==null){
+            enumName = stat;
+        }
+
+        return enumName;
+    }
+
+    public static String getEnumName(Stat stat) {
+        return getEnumName(stat.statId);
     }
 
 
@@ -87,7 +99,7 @@ public class PlayerStats {
 
 
 
-    private void scanStats(EntityPlayerMP player, StatBase[] statIds) {
+    private void scanStats(EntityPlayerMP player) {
         StatisticsManagerServer statServer = player.getStatFile();
         for(StatBase stat : StatList.BASIC_STATS){
             set(stat.statId,stat.getStatName().getFormattedText(),statServer.readStat(stat));
@@ -106,12 +118,18 @@ public class PlayerStats {
         set("stat.useItem","Items used",sum);
     }
 
+    private void scanStats(PlayerContainer player) {
+        for(Map.Entry<String,Double> stat : player.stats.entrySet()){
+            set(stat.getKey(),stat.getValue());
+        }
+    }
 
 
 
-    public void set(String statId, String statName, int value){
+
+    public void set(String statId, String statName, double value){
         if(!exists(statId)){
-            stats.add(new Stat(statId,statName,value));
+            stats.add(new Stat(getEnumName(statId),statName,value));
         }else{
             Stat found = find(statId);
             found.statName = statName;
@@ -122,11 +140,11 @@ public class PlayerStats {
 
 
 
-    public void set(String statId, int value){
+    public void set(String statId, double value){
         if(!exists(statId)){
-            stats.add(new Stat(statId,statId.toString(),value));
+            stats.add(new Stat(getEnumName(statId),statId,value));
         }else{
-            Stat found = find(statId);
+            Stat found = find(getEnumName(statId));
             found.value = value;
         }
     }
@@ -135,7 +153,7 @@ public class PlayerStats {
 
 
     public Stat get(String statId){
-        return find(statId);
+        return find(getEnumName(statId));
     }
 
     public List<Stat> getAll(){
@@ -162,9 +180,13 @@ public class PlayerStats {
         return true;
     }
 
+    public PlayerStats update(PlayerContainer player) {
+        scanStats(player);
+        return this;
+    }
 
     public PlayerStats update(EntityPlayerMP player) {
-        scanStats(player,statIds);
+        scanStats(player);
         return this;
     }
 }

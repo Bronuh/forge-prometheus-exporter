@@ -4,6 +4,8 @@ import bronuh.shit.MetricsServer;
 import bronuh.shit.metrics.*;
 import bronuh.shit.metrics.tools.Scheduler;
 import bronuh.shit.proxy.server.Events;
+import bronuh.shit.tools.MetricsContainer;
+import bronuh.shit.tools.PlayerContainer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -13,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class CommonProxy
 {
@@ -34,6 +37,8 @@ public class CommonProxy
     public static boolean enablePlayersListMetric;
     public static boolean enablePlayersStatsMetric;
     public static boolean enableLoadedChunksMetric;
+    public static boolean opCommands;
+
     public static Metric playersStatsMetric;
     public static Metric playersCountMetric;
     public static Metric playersListMetric;
@@ -89,6 +94,10 @@ public class CommonProxy
                 "Collect loaded chunks",
                 true).getBoolean();
 
+        opCommands = config.get("commands",
+                "Admin only commands",
+                false).getBoolean();
+
 
         logger = event.getModLog();
         MinecraftForge.EVENT_BUS.register(new Scheduler());
@@ -98,7 +107,12 @@ public class CommonProxy
 
     public void init(FMLInitializationEvent event)
     {
-        //event.registerServerCommand(new CommandRepair());
+        logger.info("Loading players stats from Metrics.json");
+        MetricsContainer.Load();
+        for(Map.Entry<String, PlayerContainer> container : MetricsContainer.getAll().entrySet()){
+            logger.info("Registering stats for "+container.getKey());
+            PlayersRegistry.register(container.getValue());
+        }
 
     }
 
@@ -137,6 +151,8 @@ public class CommonProxy
                 Scheduler.scheduleSyncRepeatingTask(chunksMetric::doCollect, 0, collectPerfTickInterval,
                         "Collecting loaded chunks");
             }
+            Scheduler.scheduleSyncRepeatingTask(MetricsContainer::Save, 0, collectPerfTickInterval,
+                    "Saving metrics data");
         }catch(Exception e){
             logger.error(e.getMessage());
         }

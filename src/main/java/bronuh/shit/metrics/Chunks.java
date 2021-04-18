@@ -1,14 +1,8 @@
 package bronuh.shit.metrics;
 
 import bronuh.shit.proxy.CommonProxy;
-import io.prometheus.client.Collector;
 import io.prometheus.client.Gauge;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
-
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Chunks extends Metric {
     private static final Gauge CHUNKS = Gauge.build()
@@ -32,6 +26,7 @@ public class Chunks extends Metric {
         for(WorldServer world : worlds){
             sum += world.getChunkProvider().getLoadedChunkCount();
         }
+
         //System.out.println("Loaded chunks: "+sum);
         return sum;
     }

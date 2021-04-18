@@ -1,5 +1,6 @@
 package bronuh.shit.metrics;
 
+import bronuh.shit.tools.PlayerContainer;
 import io.prometheus.client.Collector;
 import net.minecraft.entity.player.EntityPlayerMP;
 import io.prometheus.client.Gauge;
@@ -29,13 +30,10 @@ public class PlayersRegistry extends Metric{
     public static PlayerStats register(EntityPlayerMP player){
         PlayerStats found = playerStats.stream().filter(s -> (s.playerName.equals(player.getName()))).findFirst().orElse(null);
         PlayerStats stats;
-        //player.sendMessage(new TextComponentString(player.getName()+" registering"));
         if(found==null){
             stats = new PlayerStats(player);
             playerStats.add(stats);
-            //player.sendMessage(new TextComponentString(player.getName()+" not found, creating"));
         }else{
-            //player.sendMessage(new TextComponentString(player.getName()+" found, updating"));
             stats = found.update(player);
         }
         for(PlayersRegistry registry : instances){
@@ -45,15 +43,25 @@ public class PlayersRegistry extends Metric{
         return stats;
     }
 
-
-    public static void SaveAll(){
-        // To be fucked with
+    public static ArrayList<PlayerStats> getAll(){
+        return playerStats;
     }
 
-    public static void LoadAll(){
-        // To be fucked with
-    }
+    public static PlayerStats register(PlayerContainer player){
+        PlayerStats found = playerStats.stream().filter(s -> (s.playerName.equals(player.name))).findFirst().orElse(null);
+        PlayerStats stats;
+        if(found==null){
+            stats = new PlayerStats(player);
+            playerStats.add(stats);
+        }else{
+            stats = found.update(player);
+        }
+        for(PlayersRegistry registry : instances){
+            registry.doCollect();
+        }
 
+        return stats;
+    }
 
     @Override
     public void doCollect() {

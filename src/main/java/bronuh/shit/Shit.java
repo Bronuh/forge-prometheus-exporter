@@ -1,5 +1,6 @@
 package bronuh.shit;
 import bronuh.shit.proxy.CommonProxy;
+import bronuh.shit.tools.MetricsContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
@@ -39,7 +40,11 @@ public class Shit {
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {
         proxy.loadComplete(event);
+    }
 
+    @Mod.EventHandler
+    public void stop(FMLServerStoppingEvent event){
+        MetricsContainer.Save();
     }
 
 
