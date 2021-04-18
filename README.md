@@ -24,6 +24,7 @@ export {
 
 metrics {
     B:"Collect JVM memory usage metrics"=true
+    B:"Collect loaded chunks"=true
     B:"Collect online players count"=true
     B:"Collect online players names"=true
     B:"Collect online players statistics"=true
