@@ -19,7 +19,7 @@ public class TpsCollector implements Runnable {
     /**
      * Every 40 ticks (2s ideally) the server will be polled
      */
-    public static final int POLL_INTERVAL = 40;
+    public static final int POLL_INTERVAL = 200;
     /**
      * The amount of TPS values to keep for calculating the average
      */
@@ -52,6 +52,7 @@ public class TpsCollector implements Runnable {
         log(tps > TICKS_PER_SECOND ? TICKS_PER_SECOND : tps);
 
         this.lastPoll = now;
+        // System.out.println("TPS: "+tps);
     }
 
     private void log(float tps) {

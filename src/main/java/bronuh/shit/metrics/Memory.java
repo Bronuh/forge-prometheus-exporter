@@ -22,4 +22,9 @@ public class Memory extends Metric{
         MEMORY.labels("free").set(Runtime.getRuntime().freeMemory());
         MEMORY.labels("allocated").set(Runtime.getRuntime().totalMemory());
     }
+
+    @Override
+    public double getValue() {
+        return Runtime.getRuntime().totalMemory();
+    }
 }

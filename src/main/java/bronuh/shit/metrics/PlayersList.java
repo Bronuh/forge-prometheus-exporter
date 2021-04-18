@@ -38,4 +38,9 @@ public class PlayersList extends Metric {
             PLAYERS_LIST.labels(player.getName()).set(1);
         }
     }
+
+    @Override
+    public double getValue() {
+        return -1;
+    }
 }

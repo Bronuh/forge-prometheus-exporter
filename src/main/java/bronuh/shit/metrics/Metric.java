@@ -67,4 +67,6 @@ public abstract class Metric {
     public boolean isEnabled() {
         return enabled;
     }
+
+    public abstract double getValue();
 }

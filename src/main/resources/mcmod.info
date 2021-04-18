@@ -2,7 +2,7 @@
   "modid": "prometheusexporter",
   "name": "Prometheus Exporter",
   "description": "Export some stats to prometheus",
-  "version": "1.0.0.0",
+  "version": "2",
   "mcversion": "1.12+",
   "url": "bronuh.zapto.org:25567",
   "authorList": ["Bronuh", "Not Key_J"],

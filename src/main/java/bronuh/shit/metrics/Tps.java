@@ -33,6 +33,11 @@ public class Tps extends Metric {
         Scheduler.cancelTask(taskId);
     }
 
+    @Override
+    public double getValue() {
+        return tpsCollector.getAverageTPS();
+    }
+
     private long startTask() {
         return Scheduler
                 .scheduleSyncRepeatingTask(tpsCollector, 0, TpsCollector.POLL_INTERVAL);

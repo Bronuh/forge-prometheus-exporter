@@ -19,7 +19,11 @@ public class PlayersCounter extends Metric {
 
     @Override
     public void doCollect() {
-        int players = CommonProxy.server.getOnlinePlayerNames().length;
-        PLAYERS.set(players);
+        PLAYERS.set(getValue());
+    }
+
+    @Override
+    public double getValue() {
+        return CommonProxy.server.getOnlinePlayerNames().length;
     }
 }

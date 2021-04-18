@@ -62,6 +62,11 @@ public class PlayersRegistry extends Metric{
         }
     }
 
+    @Override
+    public double getValue() {
+        return -1;
+    }
+
     private void collect(PlayerStats statistics){
 
         for(Stat stat : statistics.getAll()){

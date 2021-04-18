@@ -33,11 +33,18 @@ public class CommonProxy
     public static boolean enablePlayersCountMetric;
     public static boolean enablePlayersListMetric;
     public static boolean enablePlayersStatsMetric;
-
+    public static boolean enableLoadedChunksMetric;
+    public static Metric playersStatsMetric;
+    public static Metric playersCountMetric;
+    public static Metric playersListMetric;
+    public static Metric memoryMetric;
+    public static Metric tpsMetric;
+    public static Metric chunksMetric;
 
 
     public void preInit(FMLPreInitializationEvent event)
     {
+
         File configDir = event.getModConfigurationDirectory();
         config = new Configuration(new File(configDir, "/bronuh/config.cfg"), VERSION, true);
         config.load();
@@ -78,6 +85,10 @@ public class CommonProxy
                 "Collect online players statistics",
                 true).getBoolean();
 
+        enableLoadedChunksMetric = config.get("metrics",
+                "Collect loaded chunks",
+                true).getBoolean();
+
 
         logger = event.getModLog();
         MinecraftForge.EVENT_BUS.register(new Scheduler());
@@ -87,6 +98,7 @@ public class CommonProxy
 
     public void init(FMLInitializationEvent event)
     {
+        //event.registerServerCommand(new CommandRepair());
 
     }
 
@@ -94,31 +106,36 @@ public class CommonProxy
         server = FMLCommonHandler.instance().getMinecraftServerInstance();
 
         try {
-            Metric tpsMetric = Metric.register(new Tps());
 
             if(enablePlayersStatsMetric){
-                Metric playersStatsMetric = Metric.register(new PlayersRegistry());
+                playersStatsMetric = Metric.register(new PlayersRegistry());
                 Scheduler.scheduleSyncRepeatingTask(playersStatsMetric::doCollect, 0, collectPlayersStatsTickInterval,
                         "Collecting players stats");
             }
             if(enablePlayersCountMetric){
-                Metric playersCountMetric = Metric.register(new PlayersCounter());
+                playersCountMetric = Metric.register(new PlayersCounter());
                 Scheduler.scheduleSyncRepeatingTask(playersCountMetric::doCollect, 0, collectPlayersTickInterval,
                         "Collecting players count");
             }
             if(enablePlayersListMetric){
-                Metric playersListMetric = Metric.register(new PlayersList());
+                playersListMetric = Metric.register(new PlayersList());
                 Scheduler.scheduleSyncRepeatingTask(playersListMetric::doCollect, 0, collectPlayersTickInterval,
                         "Collecting players list");
             }
             if(enableMemoryMetric){
-                Metric memoryMetric = Metric.register(new Memory());
+                memoryMetric = Metric.register(new Memory());
                 Scheduler.scheduleSyncRepeatingTask(memoryMetric::doCollect, 0, collectPerfTickInterval,
                         "Collecting JVM memory usage");
             }
             if(enableTpsMetric){
+                tpsMetric = Metric.register(new Tps());
                 Scheduler.scheduleSyncRepeatingTask(tpsMetric::doCollect, 0, collectPerfTickInterval,
                         "Collecting server TPS");
+            }
+            if(enableLoadedChunksMetric){
+                chunksMetric = Metric.register(new Chunks());
+                Scheduler.scheduleSyncRepeatingTask(chunksMetric::doCollect, 0, collectPerfTickInterval,
+                        "Collecting loaded chunks");
             }
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -140,5 +157,9 @@ public class CommonProxy
 
     public void loadComplete(FMLLoadCompleteEvent event) {
         config.save();
+    }
+
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new MetricsCommand());
     }
 }

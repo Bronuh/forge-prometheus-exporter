@@ -13,6 +13,12 @@ public class Shit {
     public static CommonProxy proxy;
 
     @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+
+        proxy.serverStarting(event);//Вызов из CommonProxy в главном классе
+    }
+
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         proxy.preInit(event);
